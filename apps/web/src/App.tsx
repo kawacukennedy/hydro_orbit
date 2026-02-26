@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
@@ -18,7 +19,8 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 export default function App() {
   return (
-    <Routes>
+    <ErrorBoundary>
+      <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route
         path="/dashboard"
@@ -38,5 +40,6 @@ export default function App() {
         <Route path="settings" element={<SettingsPage />} />
       </Route>
     </Routes>
+    </ErrorBoundary>
   );
 }
