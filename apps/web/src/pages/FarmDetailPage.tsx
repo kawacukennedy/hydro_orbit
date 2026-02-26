@@ -1,10 +1,16 @@
-import { MapPin, Droplet, Flask, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { MapPin, Droplet, Flask, CheckCircle, XCircle, AlertCircle, Plus, Leaf } from 'lucide-react';
 import { Card, CardHeader, CardContent, Badge, Button } from '@hydro-orbit/ui';
 
 const zones = [
   { name: 'Zone A (Tomatoes)', moisture: '45%', pH: '6.5', status: 'good', lastWatered: '3h ago' },
   { name: 'Zone B (Maize)', moisture: '20%', pH: '7.2', status: 'dry', lastWatered: '12h ago' },
   { name: 'Zone C (Beans)', moisture: '60%', pH: '6.8', status: 'wet', lastWatered: '1h ago' }
+];
+
+const crops = [
+  { name: 'Tomatoes', area: '0.8 ha', harvest: '45 days', icon: Leaf },
+  { name: 'Maize', area: '1.2 ha', harvest: '90 days', icon: Leaf },
+  { name: 'Beans', area: '0.5 ha', harvest: '60 days', icon: Leaf }
 ];
 
 export default function FarmDetailPage() {
@@ -62,6 +68,26 @@ export default function FarmDetailPage() {
               <div className="w-4 h-4 bg-blue-300 rounded" />
               <span>Wet</span>
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader title="Crops" />
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {crops.map((crop, i) => (
+              <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-emerald-100 rounded-lg">
+                  <crop.icon className="w-5 h-5 text-emerald-600" />
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">{crop.name}</p>
+                  <p className="text-sm text-gray-500">{crop.area}</p>
+                  <p className="text-xs text-emerald-600">Harvest: {crop.harvest}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
