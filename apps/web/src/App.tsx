@@ -4,6 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import FarmDetailPage from './pages/FarmDetailPage';
+import CreateFarmPage from './pages/CreateFarmPage';
 import SensorsPage from './pages/SensorsPage';
 import IrrigationControlPage from './pages/IrrigationControlPage';
 import HistoryPage from './pages/HistoryPage';
@@ -28,6 +29,7 @@ export default function App() {
         }
       >
         <Route index element={<DashboardPage />} />
+        <Route path="create-farm" element={<CreateFarmPage />} />
         <Route path="farm/:farmId" element={<FarmDetailPage />} />
         <Route path="sensors" element={<SensorsPage />} />
         <Route path="irrigation" element={<IrrigationControlPage />} />
