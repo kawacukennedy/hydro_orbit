@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { prisma, io } from '../index.js';
+import { prisma } from '../index.js';
 import { AppError } from '../middleware/errorHandler.js';
 import { auth, AuthRequest } from '../middleware/auth.js';
 import { alertAcknowledgeSchema } from '@hydro-orbit/shared-validators';
@@ -17,7 +17,7 @@ router.get('/', async (req: AuthRequest, res, next) => {
       select: { id: true },
     });
 
-    const farmIds = farms.map((f) => f.id);
+    const farmIds = farms.map((f: { id: string }) => f.id);
 
     const where: Record<string, unknown> = { farmId: { in: farmIds } };
 
@@ -61,7 +61,7 @@ router.post('/acknowledge-all', async (req: AuthRequest, res, next) => {
       select: { id: true },
     });
 
-    const farmIds = farms.map((f) => f.id);
+    const farmIds = farms.map((f: { id: string }) => f.id);
 
     await prisma.alert.updateMany({
       where: { farmId: { in: farmIds }, acknowledged: false },

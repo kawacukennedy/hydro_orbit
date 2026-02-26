@@ -136,7 +136,7 @@ router.get('/:farmId/stats', async (req: AuthRequest, res, next) => {
 
     const sensorCount = farm.sensors.length;
     const zoneCount = farm.zones.length;
-    const onlineSensors = farm.sensors.filter(s => s.status === 'ONLINE').length;
+    const onlineSensors = farm.sensors.filter((s: { status: string }) => s.status === 'ONLINE').length;
 
     const stats = {
       totalArea: farm.area,

@@ -15,7 +15,7 @@ router.get('/', async (req: AuthRequest, res, next) => {
       select: { id: true },
     });
 
-    const farmIds = farms.map((f) => f.id);
+    const farmIds = farms.map((f: { id: string }) => f.id);
 
     const sensors = await prisma.sensor.findMany({
       where: { farmId: { in: farmIds } },

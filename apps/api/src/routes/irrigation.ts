@@ -78,7 +78,7 @@ router.get('/schedules', async (req: AuthRequest, res, next) => {
       select: { id: true },
     });
 
-    const farmIds = farms.map((f) => f.id);
+    const farmIds = farms.map((f: { id: string }) => f.id);
 
     const schedules = await prisma.irrigationSchedule.findMany({
       where: { zone: { farmId: { in: farmIds } } },
