@@ -1,13 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sun, Droplet, Gauge, TestTube, Clock, TrendingDown, TrendingUp, Hand, Map, Activity, AlertTriangle, AlertOctagon } from 'lucide-react';
-import { Card, CardHeader, CardContent, Badge, Spinner } from '@hydro-orbit/ui';
+import { Card, CardHeader, CardContent, Badge } from '@hydro-orbit/ui';
 import { useAuthStore } from '../stores/authStore';
-import { useFarms, useSensors, useAlerts, useIrrigationHistory } from '../hooks/useApi';
+
+const mockSensors = [
+  { id: '1', type: 'MOISTURE', lastReading: 32, status: 'ONLINE' },
+  { id: '2', type: 'MOISTURE', lastReading: 28, status: 'ONLINE' },
+  { id: '3', type: 'PH', lastReading: 6.8, status: 'ONLINE' },
+  { id: '4', type: 'WATER_LEVEL', lastReading: 1200, status: 'ONLINE' },
+];
+
+const mockAlerts = [
+  { id: '1', severity: 'WARNING', message: 'Low water level in Tank B', createdAt: new Date(Date.now() - 10 * 60000).toISOString() },
+  { id: '2', severity: 'CRITICAL', message: 'pH imbalance detected in Zone 3', createdAt: new Date(Date.now() - 60 * 60000).toISOString() },
+];
+
+const mockFarms = [
+  { id: 'farm-1', name: 'Green Valley Farm', location: 'Kigali, Rwanda', area: 2.5 },
+];
 
 interface Sensor {
+  id: string;
   type: string;
   lastReading: number;
+  status: string;
 }
 
 interface Alert {
@@ -17,26 +34,23 @@ interface Alert {
   createdAt: string;
 }
 
-const defaultCards = [
-  { title: 'Soil Moisture', value: '--%', icon: Droplet, color: 'blue', trend: null as string | null, status: 'normal' },
-  { title: 'Water Level', value: '-- L', icon: Gauge, color: 'cyan', status: 'good' },
-  { title: 'pH Level', value: '--', icon: TestTube, color: 'green', status: 'optimal' },
-  { title: 'Last Irrigation', value: 'Never', icon: Clock, color: 'gray', status: 'normal' }
-];
-
-const defaultAlerts = [
-  { message: 'No alerts', time: '', severity: 'info', icon: Activity }
-];
-
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const { data: farms } = useFarms();
-  const { data: sensors } = useSensors();
-  const { data: alerts } = useAlerts(true);
-  const { data: irrigationHistory } = useIrrigationHistory(undefined, 1);
+  const [sensors] = useState<Sensor[]>(mockSensors);
+  const [alerts] = useState<Alert[]>(mockAlerts);
+  const [farms] = useState(mockFarms);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [summaryData, setSummaryData] = useState(defaultCards);
-  const [recentAlerts, setRecentAlerts] = useState(defaultAlerts);
+  const [summaryData, setSummaryData] = useState([
+    { title: 'Soil Moisture', value: '--%', icon: Droplet, color: 'blue', trend: null as string | null, status: 'normal' },
+    { title: 'Water Level', value: '-- L', icon: Gauge, color: 'cyan', status: 'good' },
+    { title: 'pH Level', value: '--', icon: TestTube, color: 'green', status: 'optimal' },
+    { title: 'Last Irrigation', value: 'Never', icon: Clock, color: 'gray', status: 'normal' }
+  ]);
+
+  const [recentAlerts, setRecentAlerts] = useState([
+    { message: 'No alerts', time: '', severity: 'info', icon: Activity }
+  ]);
 
   const greeting = () => {
     const hour = new Date().getHours();
@@ -46,43 +60,45 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (sensors && Array.isArray(sensors) && sensors.length > 0) {
-      const moistureSensors = sensors.filter((s: Sensor) => s.type === 'MOISTURE');
-      const phSensors = sensors.filter((s: Sensor) => s.type === 'PH');
-      const waterSensors = sensors.filter((s: Sensor) => s.type === 'WATER_LEVEL');
+    setTimeout(() => {
+      if (sensors && sensors.length > 0) {
+        const moistureSensors = sensors.filter((s) => s.type === 'MOISTURE');
+        const phSensors = sensors.filter((s) => s.type === 'PH');
+        const waterSensors = sensors.filter((s) => s.type === 'WATER_LEVEL');
 
-      const avgMoisture = moistureSensors.length > 0
-        ? (moistureSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / moistureSensors.length).toFixed(0)
-        : '--';
-      
-      const avgPh = phSensors.length > 0
-        ? (phSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / phSensors.length).toFixed(1)
-        : '--';
+        const avgMoisture = moistureSensors.length > 0
+          ? (moistureSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / moistureSensors.length).toFixed(0)
+          : '--';
+        
+        const avgPh = phSensors.length > 0
+          ? (phSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / phSensors.length).toFixed(1)
+          : '--';
 
-      const waterLevel = waterSensors.length > 0
-        ? (waterSensors[0]?.lastReading || 0)
-        : 0;
+        const waterLevel = waterSensors.length > 0
+          ? (waterSensors[0]?.lastReading || 0)
+          : 0;
 
-      setSummaryData([
-        { title: 'Soil Moisture', value: `${avgMoisture}%`, icon: Droplet, color: 'blue', trend: 'down', status: Number(avgMoisture) < 30 ? 'dry' : 'normal' },
-        { title: 'Water Level', value: `${waterLevel.toLocaleString()} L`, icon: Gauge, color: 'cyan', status: waterLevel > 500 ? 'good' : 'low' },
-        { title: 'pH Level', value: avgPh, icon: TestTube, color: 'green', status: Number(avgPh) >= 6 && Number(avgPh) <= 7 ? 'optimal' : 'imbalanced' },
-        { title: 'Last Irrigation', value: irrigationHistory && Array.isArray(irrigationHistory) && irrigationHistory.length > 0 ? 'Recently' : 'Never', icon: Clock, color: 'gray', status: 'normal' }
-      ]);
-    }
-  }, [sensors, irrigationHistory]);
+        setSummaryData([
+          { title: 'Soil Moisture', value: `${avgMoisture}%`, icon: Droplet, color: 'blue', trend: 'down', status: Number(avgMoisture) < 30 ? 'dry' : 'normal' },
+          { title: 'Water Level', value: `${waterLevel.toLocaleString()} L`, icon: Gauge, color: 'cyan', status: waterLevel > 500 ? 'good' : 'low' },
+          { title: 'pH Level', value: avgPh, icon: TestTube, color: 'green', status: Number(avgPh) >= 6 && Number(avgPh) <= 7 ? 'optimal' : 'imbalanced' },
+          { title: 'Last Irrigation', value: '2 hours ago', icon: Clock, color: 'gray', status: 'normal' }
+        ]);
+      }
 
-  useEffect(() => {
-    if (alerts && Array.isArray(alerts) && alerts.length > 0) {
-      const formattedAlerts = alerts.slice(0, 3).map((alert: Alert) => ({
-        message: alert.message,
-        time: formatTimeAgo(alert.createdAt),
-        severity: alert.severity.toLowerCase(),
-        icon: alert.severity === 'CRITICAL' ? AlertOctagon : AlertTriangle
-      }));
-      setRecentAlerts(formattedAlerts);
-    }
-  }, [alerts]);
+      if (alerts && alerts.length > 0) {
+        const formattedAlerts = alerts.slice(0, 3).map((alert) => ({
+          message: alert.message,
+          time: formatTimeAgo(alert.createdAt),
+          severity: alert.severity.toLowerCase(),
+          icon: alert.severity === 'CRITICAL' ? AlertOctagon : AlertTriangle
+        }));
+        setRecentAlerts(formattedAlerts);
+      }
+
+      setIsLoading(false);
+    }, 500);
+  }, [sensors, alerts]);
 
   const formatTimeAgo = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -98,8 +114,7 @@ export default function DashboardPage() {
     return `${diffDays}d ago`;
   };
 
-  const isLoading = !farms && !sensors && !alerts;
-  const currentFarm = farms && Array.isArray(farms) && farms.length > 0 ? farms[0] : null;
+  const currentFarm = farms && farms.length > 0 ? farms[0] : null;
 
   return (
     <div className="space-y-6">
@@ -107,12 +122,6 @@ export default function DashboardPage() {
         <Sun className="w-8 h-8 text-amber-500" />
         <h1 className="text-2xl font-bold text-gray-900">{greeting()}, {user?.name || 'Farmer'}!</h1>
       </div>
-
-      {isLoading && (
-        <div className="flex justify-center py-8">
-          <Spinner size="lg" />
-        </div>
-      )}
 
       {!isLoading && (
         <>

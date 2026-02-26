@@ -1,12 +1,12 @@
 import { BellRing, AlertOctagon, AlertTriangle, Info, Check, Clock, Trash2 } from 'lucide-react';
 import { Card, CardContent, Badge, Button } from '@hydro-orbit/ui';
 
-const alerts = [
+const mockAlerts = [
   { 
     id: 'a1', 
     severity: 'critical', 
     message: 'pH level critically low in Zone B (5.2)', 
-    timestamp: '2023-10-05T08:30:00Z', 
+    timestamp: new Date(Date.now() - 30 * 60000).toISOString(), 
     acknowledged: false, 
     icon: AlertOctagon 
   },
@@ -14,7 +14,7 @@ const alerts = [
     id: 'a2', 
     severity: 'warning', 
     message: 'Water tank below 20%', 
-    timestamp: '2023-10-05T07:45:00Z', 
+    timestamp: new Date(Date.now() - 75 * 60000).toISOString(), 
     acknowledged: true, 
     icon: AlertTriangle 
   },
@@ -22,7 +22,7 @@ const alerts = [
     id: 'a3', 
     severity: 'info', 
     message: 'Sensor S4 battery low (15%)', 
-    timestamp: '2023-10-05T06:20:00Z', 
+    timestamp: new Date(Date.now() - 2 * 60 * 60000).toISOString(), 
     acknowledged: false, 
     icon: Info 
   }
@@ -76,7 +76,7 @@ export default function AlertsPage() {
 
       <Card>
         <CardContent className="space-y-4">
-          {alerts.map((alert) => (
+          {mockAlerts.map((alert) => (
             <div 
               key={alert.id} 
               className={`p-4 rounded-lg ${alert.acknowledged ? 'bg-gray-50' : 'bg-white border border-gray-200'}`}
@@ -91,8 +91,8 @@ export default function AlertsPage() {
                     {!alert.acknowledged && <Badge variant="default">New</Badge>}
                   </div>
                   <p className="text-gray-900">{alert.message}</p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
+                  <div className="flex items-center gap-4 mt-2">
+                    <span className="flex items-center gap-1 text-sm text-gray-500">
                       <Clock className="w-3 h-3" />
                       {formatTime(alert.timestamp)}
                     </span>

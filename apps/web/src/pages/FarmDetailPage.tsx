@@ -1,13 +1,13 @@
 import { MapPin, Droplet, TestTube, CheckCircle, XCircle, AlertCircle, Leaf } from 'lucide-react';
 import { Card, CardHeader, CardContent, Button } from '@hydro-orbit/ui';
 
-const zones = [
+const mockZones = [
   { name: 'Zone A (Tomatoes)', moisture: '45%', pH: '6.5', status: 'good', lastWatered: '3h ago' },
   { name: 'Zone B (Maize)', moisture: '20%', pH: '7.2', status: 'dry', lastWatered: '12h ago' },
   { name: 'Zone C (Beans)', moisture: '60%', pH: '6.8', status: 'wet', lastWatered: '1h ago' }
 ];
 
-const crops = [
+const mockCrops = [
   { name: 'Tomatoes', area: '0.8 ha', harvest: '45 days', icon: Leaf },
   { name: 'Maize', area: '1.2 ha', harvest: '90 days', icon: Leaf },
   { name: 'Beans', area: '0.5 ha', harvest: '60 days', icon: Leaf }
@@ -40,7 +40,7 @@ export default function FarmDetailPage() {
         <CardContent>
           <div className="h-64 bg-gray-50 rounded-lg relative overflow-hidden">
             <div className="absolute inset-4 grid grid-cols-3 gap-4">
-              {zones.map((zone, i) => (
+              {mockZones.map((zone, i) => (
                 <div
                   key={i}
                   className={`rounded-lg p-4 flex flex-col items-center justify-center ${
@@ -76,7 +76,7 @@ export default function FarmDetailPage() {
         <CardHeader title="Crops" />
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {crops.map((crop, i) => (
+            {mockCrops.map((crop, i) => (
               <div key={i} className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                 <div className="p-2 bg-emerald-100 rounded-lg">
                   <crop.icon className="w-5 h-5 text-emerald-600" />
@@ -95,7 +95,7 @@ export default function FarmDetailPage() {
       <Card>
         <CardHeader title="Zones" />
         <CardContent className="space-y-4">
-          {zones.map((zone, i) => (
+          {mockZones.map((zone, i) => (
             <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-3">
                 {getStatusIcon(zone.status)}

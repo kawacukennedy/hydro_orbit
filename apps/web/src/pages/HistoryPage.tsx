@@ -1,10 +1,10 @@
 import { CalendarClock, Sprout, AlertTriangle, Activity, Droplet } from 'lucide-react';
 import { Card, CardContent, Badge } from '@hydro-orbit/ui';
 
-const events = [
-  { timestamp: '2023-10-05T06:30:00Z', event: 'Irrigation', zone: 'Zone A', duration: '15 min', volume: '75 L', icon: Sprout },
-  { timestamp: '2023-10-05T04:15:00Z', event: 'Alert', zone: 'Zone B', message: 'Low moisture (18%)', severity: 'warning', icon: AlertTriangle },
-  { timestamp: '2023-10-04T23:00:00Z', event: 'Sensor Reading', zone: 'Zone A', moisture: '32%', pH: '6.8', icon: Activity }
+const mockEvents = [
+  { timestamp: new Date(Date.now() - 6 * 60 * 60000).toISOString(), event: 'Irrigation', zone: 'Zone A', duration: '15 min', volume: '75 L', icon: Sprout },
+  { timestamp: new Date(Date.now() - 10 * 60 * 60000).toISOString(), event: 'Alert', zone: 'Zone B', message: 'Low moisture (18%)', severity: 'warning', icon: AlertTriangle },
+  { timestamp: new Date(Date.now() - 23 * 60 * 60000).toISOString(), event: 'Sensor Reading', zone: 'Zone A', moisture: '32%', pH: '6.8', icon: Activity }
 ];
 
 const formatDate = (date: string) => {
@@ -49,7 +49,7 @@ export default function HistoryPage() {
 
       <Card>
         <CardContent className="space-y-4">
-          {events.map((item, i) => (
+          {mockEvents.map((item, i) => (
             <div key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
               <div className="p-2 bg-white rounded-lg">
                 <item.icon className="w-5 h-5 text-gray-600" />

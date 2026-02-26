@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { Sprout, Bot, User, Calendar, Droplet } from 'lucide-react';
 import { Card, CardHeader, CardContent, Button } from '@hydro-orbit/ui';
 
-const modes = [
+const mockModes = [
   { label: 'Auto (AI)', value: 'auto', icon: Bot, description: 'System decides based on soil and weather' },
   { label: 'Manual', value: 'manual', icon: User, description: 'You control when to water' },
   { label: 'Schedule', value: 'schedule', icon: Calendar, description: 'Set specific times' }
 ];
 
-const zones = [
+const mockZones = [
   { name: 'Zone A', moisture: '32%' },
   { name: 'Zone B', moisture: '20%' }
 ];
 
-const schedules = [
+const mockSchedules = [
   { zone: 'Zone A', days: ['Mon', 'Wed', 'Fri'], time: '06:00', duration: 15, enabled: true },
   { zone: 'Zone B', days: ['Tue', 'Thu', 'Sat'], time: '18:00', duration: 20, enabled: true }
 ];
@@ -35,7 +35,7 @@ export default function IrrigationControlPage() {
         <CardHeader title="Mode" />
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {modes.map((m) => (
+            {mockModes.map((m) => (
               <button
                 key={m.value}
                 onClick={() => setMode(m.value)}
@@ -60,7 +60,7 @@ export default function IrrigationControlPage() {
         <Card>
           <CardHeader title="Manual Control" />
           <CardContent className="space-y-4">
-            {zones.map((zone) => (
+            {mockZones.map((zone) => (
               <div key={zone.name} className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center justify-between mb-3">
                   <div>
@@ -94,7 +94,7 @@ export default function IrrigationControlPage() {
         <Card>
           <CardHeader title="Schedules" />
           <CardContent className="space-y-4">
-            {schedules.map((schedule, i) => (
+            {mockSchedules.map((schedule, i) => (
               <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium">{schedule.zone}</p>

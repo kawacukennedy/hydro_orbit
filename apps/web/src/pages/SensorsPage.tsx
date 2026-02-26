@@ -1,7 +1,7 @@
 import { Network, Waves, TestTube, Gauge, Battery, BatteryWarning, Wifi, WifiOff } from 'lucide-react';
 import { Card, CardContent, Badge } from '@hydro-orbit/ui';
 
-const sensors = [
+const mockSensors = [
   { id: 's1', type: 'moisture', location: 'Zone A', value: '32%', battery: 98, status: 'online', icon: Waves },
   { id: 's2', type: 'pH', location: 'Zone A', value: '6.8', battery: 95, status: 'online', icon: TestTube },
   { id: 's3', type: 'waterLevel', location: 'Main Tank', value: '1200L', battery: 100, status: 'online', icon: Gauge },
@@ -34,7 +34,7 @@ export default function SensorsPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {sensors.map((sensor) => (
+        {mockSensors.map((sensor) => (
           <Card key={sensor.id}>
             <CardContent>
               <div className="flex items-start justify-between mb-4">
