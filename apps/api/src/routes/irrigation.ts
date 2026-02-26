@@ -121,4 +121,23 @@ router.post('/mode', async (req: AuthRequest, res, next) => {
   }
 });
 
+router.get('/history', async (req: AuthRequest, res, next) => {
+  try {
+    const { farmId, limit = '20' } = req.query;
+    
+    const where = farmId ? { zone: { farmId: farmId as string } } : {};
+
+    const events = await prisma.irrigationEvent.findMany({
+      where,
+      include: { zone: true },
+      orderBy: { startTime: 'desc' },
+      take: parseInt(limit as string),
+    });
+
+    res.json(events);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
