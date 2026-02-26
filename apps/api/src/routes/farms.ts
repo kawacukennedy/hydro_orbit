@@ -123,4 +123,33 @@ router.post('/:farmId/zones', async (req: AuthRequest, res, next) => {
   }
 });
 
+router.get('/:farmId/stats', async (req: AuthRequest, res, next) => {
+  try {
+    const farm = await prisma.farm.findFirst({
+      where: { id: req.params.farmId, userId: req.user!.userId },
+      include: { zones: true, sensors: true },
+    });
+
+    if (!farm) {
+      throw new AppError('Farm not found', 404);
+    }
+
+    const sensorCount = farm.sensors.length;
+    const zoneCount = farm.zones.length;
+    const onlineSensors = farm.sensors.filter(s => s.status === 'ONLINE').length;
+
+    const stats = {
+      totalArea: farm.area,
+      zoneCount,
+      sensorCount,
+      onlineSensors,
+      offlineSensors: sensorCount - onlineSensors,
+    };
+
+    res.json(stats);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
