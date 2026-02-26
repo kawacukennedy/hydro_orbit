@@ -78,3 +78,69 @@ export function throttle<T extends (...args: unknown[]) => unknown>(
     }
   };
 }
+
+export enum SensorType {
+  MOISTURE = 'MOISTURE',
+  PH = 'PH',
+  WATER_LEVEL = 'WATER_LEVEL',
+}
+
+export function getSensorUnit(type: SensorType | string): string {
+  switch (type) {
+    case SensorType.MOISTURE:
+      return '%';
+    case SensorType.PH:
+      return 'pH';
+    case SensorType.WATER_LEVEL:
+      return 'L';
+    default:
+      return '';
+  }
+}
+
+export function getSensorLabel(type: SensorType | string): string {
+  switch (type) {
+    case SensorType.MOISTURE:
+      return 'Soil Moisture';
+    case SensorType.PH:
+      return 'pH Level';
+    case SensorType.WATER_LEVEL:
+      return 'Water Level';
+    default:
+      return 'Unknown';
+  }
+}
+
+export function isValidSensorValue(type: SensorType | string, value: number): boolean {
+  switch (type) {
+    case SensorType.MOISTURE:
+      return value >= 0 && value <= 100;
+    case SensorType.PH:
+      return value >= 0 && value <= 14;
+    case SensorType.WATER_LEVEL:
+      return value >= 0;
+    default:
+      return false;
+  }
+}
+
+export function getSensorStatus(battery: number, lastReadingAge: number): 'ONLINE' | 'OFFLINE' | 'LOW_BATTERY' {
+  if (battery < 20) return 'LOW_BATTERY';
+  if (lastReadingAge > 3600000) return 'OFFLINE';
+  return 'ONLINE';
+}
+
+export function calculateAverageReading(readings: number[]): number {
+  if (readings.length === 0) return 0;
+  return readings.reduce((a, b) => a + b, 0) / readings.length;
+}
+
+export function calculateTrend(readings: number[]): 'up' | 'down' | 'stable' {
+  if (readings.length < 2) return 'stable';
+  const recent = readings.slice(-5);
+  const avg = calculateAverageReading(recent);
+  const last = recent[recent.length - 1];
+  const diff = last - avg;
+  if (Math.abs(diff) < 2) return 'stable';
+  return diff > 0 ? 'up' : 'down';
+}
