@@ -3,43 +3,14 @@ import { Link } from 'react-router-dom';
 import { Sun, Droplet, Gauge, TestTube, Clock, TrendingDown, TrendingUp, Hand, Map, Activity, AlertTriangle, AlertOctagon } from 'lucide-react';
 import { Card, CardHeader, CardContent, Badge } from '@hydro-orbit/ui';
 import { useAuthStore } from '../stores/authStore';
-
-const mockSensors = [
-  { id: '1', type: 'MOISTURE', lastReading: 32, status: 'ONLINE' },
-  { id: '2', type: 'MOISTURE', lastReading: 28, status: 'ONLINE' },
-  { id: '3', type: 'PH', lastReading: 6.8, status: 'ONLINE' },
-  { id: '4', type: 'WATER_LEVEL', lastReading: 1200, status: 'ONLINE' },
-];
-
-const mockAlerts = [
-  { id: '1', severity: 'WARNING', message: 'Low water level in Tank B', createdAt: new Date(Date.now() - 10 * 60000).toISOString() },
-  { id: '2', severity: 'CRITICAL', message: 'pH imbalance detected in Zone 3', createdAt: new Date(Date.now() - 60 * 60000).toISOString() },
-];
-
-const mockFarms = [
-  { id: 'farm-1', name: 'Green Valley Farm', location: 'Kigali, Rwanda', area: 2.5 },
-];
-
-interface Sensor {
-  id: string;
-  type: string;
-  lastReading: number;
-  status: string;
-}
-
-interface Alert {
-  id: string;
-  severity: string;
-  message: string;
-  createdAt: string;
-}
+import { useSensors, useAlerts, useFarms } from '../hooks/useApi';
 
 export default function DashboardPage() {
   const { user } = useAuthStore();
-  const [sensors] = useState<Sensor[]>(mockSensors);
-  const [alerts] = useState<Alert[]>(mockAlerts);
-  const [farms] = useState(mockFarms);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: sensors, isLoading: isSensorsLoading } = useSensors();
+  const { data: alerts, isLoading: isAlertsLoading } = useAlerts();
+  const { data: farms, isLoading: isFarmsLoading } = useFarms();
+  const isLoading = isSensorsLoading || isAlertsLoading || isFarmsLoading;
 
   const [summaryData, setSummaryData] = useState([
     { title: 'Soil Moisture', value: '--%', icon: Droplet, color: 'blue', trend: null as string | null, status: 'normal' },
@@ -60,47 +31,44 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      if (sensors && sensors.length > 0) {
-        const moistureSensors = sensors.filter((s) => s.type === 'MOISTURE');
-        const phSensors = sensors.filter((s) => s.type === 'PH');
-        const waterSensors = sensors.filter((s) => s.type === 'WATER_LEVEL');
+    if (isLoading) return;
+    if (sensors && sensors.length > 0) {
+      const moistureSensors = sensors.filter((s) => s.type === 'MOISTURE');
+      const phSensors = sensors.filter((s) => s.type === 'PH');
+      const waterSensors = sensors.filter((s) => s.type === 'WATER_LEVEL');
 
-        const avgMoisture = moistureSensors.length > 0
-          ? (moistureSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / moistureSensors.length).toFixed(0)
-          : '--';
-        
-        const avgPh = phSensors.length > 0
-          ? (phSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / phSensors.length).toFixed(1)
-          : '--';
+      const avgMoisture = moistureSensors.length > 0
+        ? (moistureSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / moistureSensors.length).toFixed(0)
+        : '--';
 
-        const waterLevel = waterSensors.length > 0
-          ? (waterSensors[0]?.lastReading || 0)
-          : 0;
+      const avgPh = phSensors.length > 0
+        ? (phSensors.reduce((acc, s) => acc + (s.lastReading || 0), 0) / phSensors.length).toFixed(1)
+        : '--';
 
-        setSummaryData([
-          { title: 'Soil Moisture', value: `${avgMoisture}%`, icon: Droplet, color: 'blue', trend: 'down', status: Number(avgMoisture) < 30 ? 'dry' : 'normal' },
-          { title: 'Water Level', value: `${waterLevel.toLocaleString()} L`, icon: Gauge, color: 'cyan', status: waterLevel > 500 ? 'good' : 'low' },
-          { title: 'pH Level', value: avgPh, icon: TestTube, color: 'green', status: Number(avgPh) >= 6 && Number(avgPh) <= 7 ? 'optimal' : 'imbalanced' },
-          { title: 'Last Irrigation', value: '2 hours ago', icon: Clock, color: 'gray', status: 'normal' }
-        ]);
-      }
+      const waterLevel = waterSensors.length > 0
+        ? (waterSensors[0]?.lastReading || 0)
+        : 0;
 
-      if (alerts && alerts.length > 0) {
-        const formattedAlerts = alerts.slice(0, 3).map((alert) => ({
-          message: alert.message,
-          time: formatTimeAgo(alert.createdAt),
-          severity: alert.severity.toLowerCase(),
-          icon: alert.severity === 'CRITICAL' ? AlertOctagon : AlertTriangle
-        }));
-        setRecentAlerts(formattedAlerts);
-      }
+      setSummaryData([
+        { title: 'Soil Moisture', value: `${avgMoisture}%`, icon: Droplet, color: 'blue', trend: 'down', status: Number(avgMoisture) < 30 ? 'dry' : 'normal' },
+        { title: 'Water Level', value: `${waterLevel.toLocaleString()} L`, icon: Gauge, color: 'cyan', status: waterLevel > 500 ? 'good' : 'low' },
+        { title: 'pH Level', value: avgPh, icon: TestTube, color: 'green', status: Number(avgPh) >= 6 && Number(avgPh) <= 7 ? 'optimal' : 'imbalanced' },
+        { title: 'Last Irrigation', value: '2 hours ago', icon: Clock, color: 'gray', status: 'normal' }
+      ]);
+    }
 
-      setIsLoading(false);
-    }, 500);
-  }, [sensors, alerts]);
+    if (alerts && alerts.length > 0) {
+      const formattedAlerts = alerts.slice(0, 3).map((alert) => ({
+        message: alert.message,
+        time: formatTimeAgo(alert.createdAt),
+        severity: alert.severity.toLowerCase(),
+        icon: alert.severity === 'CRITICAL' ? AlertOctagon : AlertTriangle
+      }));
+      setRecentAlerts(formattedAlerts);
+    }
+  }, [sensors, alerts, isLoading]);
 
-  const formatTimeAgo = (dateStr: string) => {
+  const formatTimeAgo = (dateStr: string | Date) => {
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -129,18 +97,16 @@ export default function DashboardPage() {
             {summaryData.map((card) => (
               <Card key={card.title}>
                 <CardContent className="flex items-center gap-4">
-                  <div className={`p-3 rounded-lg ${
-                    card.color === 'blue' ? 'bg-blue-100' :
+                  <div className={`p-3 rounded-lg ${card.color === 'blue' ? 'bg-blue-100' :
                     card.color === 'cyan' ? 'bg-cyan-100' :
-                    card.color === 'green' ? 'bg-green-100' :
-                    'bg-gray-100'
-                  }`}>
-                    <card.icon className={`w-6 h-6 ${
-                      card.color === 'blue' ? 'text-blue-600' :
+                      card.color === 'green' ? 'bg-green-100' :
+                        'bg-gray-100'
+                    }`}>
+                    <card.icon className={`w-6 h-6 ${card.color === 'blue' ? 'text-blue-600' :
                       card.color === 'cyan' ? 'text-cyan-600' :
-                      card.color === 'green' ? 'text-green-600' :
-                      'text-gray-600'
-                    }`} />
+                        card.color === 'green' ? 'text-green-600' :
+                          'text-gray-600'
+                      }`} />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">{card.title}</p>
@@ -190,19 +156,18 @@ export default function DashboardPage() {
               <CardContent className="space-y-3">
                 {recentAlerts.map((alert, i) => (
                   <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <alert.icon className={`w-5 h-5 mt-0.5 ${
-                      alert.severity === 'critical' ? 'text-red-500' :
+                    <alert.icon className={`w-5 h-5 mt-0.5 ${alert.severity === 'critical' ? 'text-red-500' :
                       alert.severity === 'warning' ? 'text-yellow-500' :
-                      'text-blue-500'
-                    }`} />
+                        'text-blue-500'
+                      }`} />
                     <div className="flex-1">
                       <p className="text-sm text-gray-900">{alert.message}</p>
                       {alert.time && <p className="text-xs text-gray-500">{alert.time}</p>}
                     </div>
                     <Badge variant={
                       alert.severity === 'critical' ? 'danger' :
-                      alert.severity === 'warning' ? 'warning' :
-                      'info'
+                        alert.severity === 'warning' ? 'warning' :
+                          'info'
                     }>
                       {alert.severity}
                     </Badge>

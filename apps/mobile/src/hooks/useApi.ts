@@ -6,7 +6,8 @@ import {
 } from '@hydro-orbit/shared-types';
 
 // Mock DB
-const delay = (ms = 500) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms = 500) => new Promise(resolve => setTimeout(() => resolve(undefined), ms));
+const generateId = () => Math.random().toString(36).substring(2, 9);
 
 class MockDb {
   farms: Farm[] = [
@@ -141,7 +142,7 @@ export function useCreateFarm() {
   return useMutation({
     mutationFn: async (data: { name: string; location: string; area: number }) => {
       await delay();
-      const newFarm = { id: crypto.randomUUID(), ...data, userId: 'user-1', createdAt: new Date(), zones: [], sensors: [] };
+      const newFarm = { id: generateId(), ...data, userId: 'user-1', createdAt: new Date(), zones: [], sensors: [] };
       db.farms.push(newFarm);
       return newFarm;
     },
@@ -182,7 +183,7 @@ export function useCreateZone() {
     mutationFn: async ({ farmId, data }: { farmId: string; data: any }) => {
       await delay();
       const farm = db.farms.find(f => f.id === farmId);
-      if (farm) farm.zones.push({ id: crypto.randomUUID(), farmId, ...data, sensors: [] });
+      if (farm) farm.zones.push({ id: generateId(), farmId, ...data, sensors: [] });
     },
     onSuccess: (_, { farmId }) => queryClient.invalidateQueries({ queryKey: ['farm', farmId] }),
   });
@@ -195,7 +196,7 @@ export function useStartManualIrrigation() {
       await delay();
       db.irrigationStatus = { status: 'active', mode: 'manual', activeZone: data.zoneId };
       db.history.unshift({
-        id: crypto.randomUUID(),
+        id: generateId(),
         zoneId: data.zoneId,
         startTime: new Date(),
         duration: data.duration,
@@ -239,7 +240,7 @@ export function useCreateSchedule() {
   return useMutation({
     mutationFn: async (data: any) => {
       await delay();
-      db.schedules.push({ id: crypto.randomUUID(), ...data });
+      db.schedules.push({ id: generateId(), ...data });
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['irrigation-schedules'] }),
   });

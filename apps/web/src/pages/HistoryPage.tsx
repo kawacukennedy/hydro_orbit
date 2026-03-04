@@ -1,11 +1,6 @@
-import { CalendarClock, Sprout, AlertTriangle, Activity, Droplet } from 'lucide-react';
-import { Card, CardContent, Badge } from '@hydro-orbit/ui';
-
-const mockEvents = [
-  { timestamp: new Date(Date.now() - 6 * 60 * 60000).toISOString(), event: 'Irrigation', zone: 'Zone A', duration: '15 min', volume: '75 L', icon: Sprout },
-  { timestamp: new Date(Date.now() - 10 * 60 * 60000).toISOString(), event: 'Alert', zone: 'Zone B', message: 'Low moisture (18%)', severity: 'warning', icon: AlertTriangle },
-  { timestamp: new Date(Date.now() - 23 * 60 * 60000).toISOString(), event: 'Sensor Reading', zone: 'Zone A', moisture: '32%', pH: '6.8', icon: Activity }
-];
+import { CalendarClock, Sprout } from 'lucide-react';
+import { Card, CardContent } from '@hydro-orbit/ui';
+import { useIrrigationHistory, useFarm } from '../hooks/useApi';
 
 const formatDate = (date: string) => {
   const d = new Date(date);
@@ -18,6 +13,9 @@ const formatTime = (date: string) => {
 };
 
 export default function HistoryPage() {
+  const { data: historyEvents } = useIrrigationHistory('farm-1');
+  const { data: farm } = useFarm('farm-1');
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
@@ -49,42 +47,29 @@ export default function HistoryPage() {
 
       <Card>
         <CardContent className="space-y-4">
-          {mockEvents.map((item, i) => (
-            <div key={i} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-              <div className="p-2 bg-white rounded-lg">
-                <item.icon className="w-5 h-5 text-gray-600" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium">{item.event}</span>
-                  {item.event === 'Alert' && (
-                    <Badge variant="warning">Warning</Badge>
-                  )}
+          {historyEvents?.map((item) => {
+            const zoneName = farm?.zones.find(z => z.id === item.zoneId)?.name || 'Unknown Zone';
+            return (
+              <div key={item.id} className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="p-2 bg-white rounded-lg">
+                  <Sprout className="w-5 h-5 text-gray-600" />
                 </div>
-                <p className="text-sm text-gray-600">{item.zone}</p>
-                {item.event === 'Irrigation' && (
-                  <p className="text-sm text-gray-500">
-                    {item.duration} • {item.volume}
-                  </p>
-                )}
-                {item.event === 'Alert' && (
-                  <p className="text-sm text-gray-500">{item.message}</p>
-                )}
-                {item.event === 'Sensor Reading' && (
-                  <div className="flex gap-4 text-sm text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Droplet className="w-3 h-3" /> {item.moisture}
-                    </span>
-                    <span>pH: {item.pH}</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium">Irrigation</span>
                   </div>
-                )}
+                  <p className="text-sm text-gray-600">{zoneName}</p>
+                  <p className="text-sm text-gray-500">
+                    {item.duration} min • {(item.volume || 0).toFixed(0)} L
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">{formatDate(item.startTime as any)}</p>
+                  <p className="text-sm text-gray-500">{formatTime(item.startTime as any)}</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-medium">{formatDate(item.timestamp)}</p>
-                <p className="text-sm text-gray-500">{formatTime(item.timestamp)}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Settings, User, Bell, Smartphone, CreditCard, Save } from 'lucide-react';
 import { Card, CardContent, Button, Input, Badge } from '@hydro-orbit/ui';
 import { useSettingsStore } from '../stores/settingsStore';
+import { useSensors } from '../hooks/useApi';
+import { SensorStatus } from '@hydro-orbit/shared-types';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -11,14 +13,20 @@ const tabs = [
   { id: 'timezone', label: 'Timezone', icon: Settings }
 ];
 
-const devices = [
-  { name: 'Main Controller', id: 'esp32-001', status: 'online', firmware: '1.2.0' },
-  { name: 'Sensor S1', id: 's1', status: 'online', battery: '98%' }
-];
-
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const { notifications, setNotifications } = useSettingsStore();
+  const { data: sensors } = useSensors();
+
+  const devices = [
+    { name: 'Main Controller', id: 'esp32-001', status: 'online', firmware: '1.2.0' },
+    ...(sensors || []).map(s => ({
+      name: `Sensor ${s.id}`,
+      id: s.id,
+      status: s.status === SensorStatus.ONLINE ? 'online' : 'offline',
+      battery: `${s.battery || 0}%`
+    }))
+  ];
 
   return (
     <div className="space-y-6">
@@ -34,11 +42,10 @@ export default function SettingsPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
-              activeTab === tab.id
-                ? 'border-emerald-500 text-emerald-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
+            className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${activeTab === tab.id
+              ? 'border-emerald-500 text-emerald-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+              }`}
           >
             <tab.icon className="w-4 h-4" />
             {tab.label}
@@ -107,8 +114,8 @@ export default function SettingsPage() {
       {activeTab === 'devices' && (
         <Card>
           <CardContent className="space-y-4">
-            {devices.map((device, i) => (
-              <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            {devices.map((device) => (
+              <div key={device.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div>
                   <p className="font-medium">{device.name}</p>
                   <p className="text-sm text-gray-500">ID: {device.id}</p>

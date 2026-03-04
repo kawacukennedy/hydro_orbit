@@ -1,11 +1,6 @@
 import { MapPin, Droplet, TestTube, CheckCircle, XCircle, AlertCircle, Leaf } from 'lucide-react';
 import { Card, CardHeader, CardContent, Button } from '@hydro-orbit/ui';
-
-const mockZones = [
-  { name: 'Zone A (Tomatoes)', moisture: '45%', pH: '6.5', status: 'good', lastWatered: '3h ago' },
-  { name: 'Zone B (Maize)', moisture: '20%', pH: '7.2', status: 'dry', lastWatered: '12h ago' },
-  { name: 'Zone C (Beans)', moisture: '60%', pH: '6.8', status: 'wet', lastWatered: '1h ago' }
-];
+import { useFarm, useFarmStats } from '../hooks/useApi';
 
 const mockCrops = [
   { name: 'Tomatoes', area: '0.8 ha', harvest: '45 days', icon: Leaf },
@@ -14,7 +9,10 @@ const mockCrops = [
 ];
 
 export default function FarmDetailPage() {
-  const getStatusIcon = (status: string) => {
+  const { data: farm } = useFarm('farm-1');
+  const { data: stats } = useFarmStats('farm-1');
+
+  const getStatusIcon = (status: 'good' | 'dry' | 'wet') => {
     switch (status) {
       case 'good': return <CheckCircle className="w-4 h-4 text-green-500" />;
       case 'dry': return <AlertCircle className="w-4 h-4 text-orange-500" />;
@@ -30,8 +28,8 @@ export default function FarmDetailPage() {
           <MapPin className="w-6 h-6 text-emerald-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">My Farm</h1>
-          <p className="text-gray-500">Kigali, Rwanda</p>
+          <h1 className="text-2xl font-bold text-gray-900">{farm?.name || 'My Farm'}</h1>
+          <p className="text-gray-500">{farm?.location || 'Location'}</p>
         </div>
       </div>
 
@@ -39,20 +37,22 @@ export default function FarmDetailPage() {
         <CardHeader title="Farm Map" />
         <CardContent>
           <div className="h-64 bg-gray-50 rounded-lg relative overflow-hidden">
-            <div className="absolute inset-4 grid grid-cols-3 gap-4">
-              {mockZones.map((zone, i) => (
-                <div
-                  key={i}
-                  className={`rounded-lg p-4 flex flex-col items-center justify-center ${
-                    zone.status === 'dry' ? 'bg-orange-100 border-2 border-orange-300' :
-                    zone.status === 'wet' ? 'bg-blue-100 border-2 border-blue-300' :
-                    'bg-green-100 border-2 border-green-300'
-                  }`}
-                >
-                  <span className="font-medium text-sm">{zone.name}</span>
-                  <span className="text-xs text-gray-600">{zone.moisture}</span>
-                </div>
-              ))}
+            <div className="absolute inset-4 grid grid-cols-2 gap-4">
+              {farm?.zones.map((zone, i) => {
+                const isDry = zone.moistureThreshold > 25;
+                const status = isDry ? 'dry' : 'good';
+                return (
+                  <div
+                    key={i}
+                    className={`rounded-lg p-4 flex flex-col items-center justify-center ${status === 'dry' ? 'bg-orange-100 border-2 border-orange-300' :
+                      'bg-green-100 border-2 border-green-300'
+                      }`}
+                  >
+                    <span className="font-medium text-sm text-center">{zone.name}</span>
+                    <span className="text-xs text-gray-600 font-bold">{zone.cropType}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
           <div className="flex gap-4 mt-4 text-sm">
@@ -95,47 +95,51 @@ export default function FarmDetailPage() {
       <Card>
         <CardHeader title="Zones" />
         <CardContent className="space-y-4">
-          {mockZones.map((zone, i) => (
-            <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-3">
-                {getStatusIcon(zone.status)}
-                <div>
-                  <p className="font-medium text-gray-900">{zone.name}</p>
-                  <p className="text-sm text-gray-500">Last watered: {zone.lastWatered}</p>
+          {farm?.zones.map((zone, i) => {
+            const isDry = zone.moistureThreshold > 25;
+            const status: 'dry' | 'wet' | 'good' = isDry ? 'dry' : 'good';
+            return (
+              <div key={i} className="flex flex-col md:flex-row items-center justify-between p-4 bg-gray-50 rounded-lg gap-4">
+                <div className="flex items-center gap-3">
+                  {getStatusIcon(status)}
+                  <div>
+                    <p className="font-medium text-gray-900">{zone.name}</p>
+                    <p className="text-sm text-gray-500">Threshold: {zone.moistureThreshold}%</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-6">
+                  <div className="text-center">
+                    <Droplet className="w-4 h-4 mx-auto text-blue-500" />
+                    <p className="text-sm font-medium">--</p>
+                  </div>
+                  <div className="text-center">
+                    <TestTube className="w-4 h-4 mx-auto text-green-500" />
+                    <p className="text-sm font-medium">--</p>
+                  </div>
+                  <Button size="sm" variant="outline">Water Now</Button>
                 </div>
               </div>
-              <div className="flex items-center gap-6">
-                <div className="text-center">
-                  <Droplet className="w-4 h-4 mx-auto text-blue-500" />
-                  <p className="text-sm font-medium">{zone.moisture}</p>
-                </div>
-                <div className="text-center">
-                  <TestTube className="w-4 h-4 mx-auto text-green-500" />
-                  <p className="text-sm font-medium">{zone.pH}</p>
-                </div>
-                <Button size="sm" variant="outline">Water Now</Button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-3 gap-4">
         <Card>
           <CardContent className="text-center py-4">
-            <p className="text-2xl font-bold text-gray-900">2.5 ha</p>
+            <p className="text-2xl font-bold text-gray-900">{farm?.area || '--'} ha</p>
             <p className="text-sm text-gray-500">Total Area</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="text-center py-4">
-            <p className="text-2xl font-bold text-gray-900">12</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.activeSensors || 0}</p>
             <p className="text-sm text-gray-500">Active Sensors</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="text-center py-4">
-            <p className="text-2xl font-bold text-gray-900">350 L</p>
+            <p className="text-2xl font-bold text-gray-900">{stats?.waterUsageToday || 0} L</p>
             <p className="text-sm text-gray-500">Water Used Today</p>
           </CardContent>
         </Card>
