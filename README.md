@@ -1,5 +1,10 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/kawacukennedy/hydro_orbit/main/docs/assets/logo.svg" alt="Hydro-Orbit Logo" width="120" />
+  <pre><code> _    ___     _______  _____   ____     ____  _____  ____ _____ _______
+| |  | \ \   / /  __ \|  __ \ / __ \   / __ \|  __ \|  _ \_   _|__   __|
+| |__| |\ \_/ /| |  | | |__) | |  | | | |  | | |__) | |_) || |    | |   
+|  __  | \   / | |  | |  _  /| |  | | | |  | |  _  /|  _ < | |    | |   
+| |  | |  | |  | |__| | | \ \| |__| | | |__| | | \ \| |_) || |_   | |   
+|_|  |_|  |_|  |_____/|_|  \_\\____/   \____/|_|  \_\____/_____|  |_|</code></pre>
 </p>
 
 <h1 align="center">Hydro‑Orbit</h1>
@@ -78,52 +83,52 @@ Hydro‑Orbit was built to change that:
 
 ---
 
-## 🏗️ Architecture
+## 🏗 Architecture
 
 ```mermaid
-graph TB
-    subgraph Field["🌱 Field"]
-        S[Soil Moisture Sensor<br/>ESP32 + Capacitive Sensor]
-        V[Valve Actuator<br/>Solenoid Valve]
-        P[Solar Panel<br/>5W + Battery]
+flowchart TD
+    subgraph Field["Field Layer"]
+        direction TB
+        S["Soil Moisture Sensor<br/>ESP32 + Capacitive"]
+        V["Solenoid Valve"]
+        P["Solar Panel + Battery"]
     end
 
-    subgraph Edge["📡 Edge"]
-        F[Firmware<br/>Arduino / PlatformIO]
-        FL[Fuzzy Logic<br/>Local Control]
-        MQTT[MQTT Broker<br/>Mosquitto]
+    subgraph Edge["Edge Layer"]
+        direction TB
+        F["ESP32 Firmware<br/>Arduino / PlatformIO"]
+        FL["Fuzzy Logic<br/>Local Control"]
+        M["MQTT Broker<br/>Mosquitto"]
     end
 
-    subgraph Cloud["☁️ Cloud / Server"]
-        API[Express API<br/>Node.js + Prisma]
-        AI[AI Engine<br/>Python / FastAPI]
-        DB[(PostgreSQL)]
-        RD[(Redis)]
-        WS[WebSocket<br/>Socket.IO]
+    subgraph Server["Server Layer"]
+        direction TB
+        API["Express API<br/>Node.js + Prisma"]
+        AI["AI Engine<br/>Python / FastAPI"]
+        DB[("PostgreSQL")]
+        RD[("Redis")]
     end
 
-    subgraph Client["📱 Client"]
-        WEB[Web Dashboard<br/>React + Vite + Tailwind]
-        MOBILE[Mobile App<br/>React Native / Expo]
+    subgraph Client["Client Layer"]
+        direction TB
+        WEB["Web Dashboard<br/>React + Vite"]
+        MOBILE["Mobile App<br/>React Native"]
     end
 
-    S -->|sensor/data| MQTT
-    MQTT -->|publish| API
-    MQTT --> F
-    F -->|irrigation/command| V
-    S --> FL
-    FL -->|emergency stop| V
-    API --> DB
-    API --> RD
-    API -->|POST /predict| AI
-    AI -->|prediction| API
-    API --> WS
-    WS --> WEB
-    WS --> MOBILE
-    WEB -->|REST + WS| API
-    MOBILE -->|REST + WS| API
     P --> S
     P --> F
+    S -->|publish| M
+    M -->|route| API
+    M -->|command| F
+    F -->|actuate| V
+    S --> FL
+    FL -->|override| V
+    API -->|persist| DB
+    API -->|cache| RD
+    API -->|predict| AI
+    AI -->|response| API
+    API -->|broadcast| WEB
+    API -->|broadcast| MOBILE
 ```
 
 ---
@@ -174,7 +179,7 @@ pnpm dev
 
 ---
 
-## 🛠️ Tech Stack
+## 🛠 Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -191,7 +196,7 @@ pnpm dev
 
 ---
 
-## 🗺️ Roadmap
+## 🗺 Roadmap
 
 ```mermaid
 gantt
