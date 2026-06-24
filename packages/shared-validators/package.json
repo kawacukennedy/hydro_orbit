@@ -1,16 +1,18 @@
 {
   "name": "@hydro-orbit/shared-validators",
   "version": "1.0.0",
+  "description": "Zod validation schemas for Hydro-Orbit",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
     "lint": "eslint src/",
-    "test": "echo \"No tests configured\""
+    "test": "vitest run"
   },
   "dependencies": {
     "zod": "^3.22.0"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }

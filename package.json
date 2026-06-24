@@ -1,14 +1,30 @@
 {
   "name": "hydro-orbit",
+  "version": "1.0.0",
   "private": true,
+  "description": "Solar-powered, AI-driven smart irrigation for smallholder farmers",
+  "keywords": [
+    "smart-irrigation",
+    "agritech",
+    "iot",
+    "esp32",
+    "soil-sensors",
+    "solar-powered",
+    "react-native",
+    "typescript",
+    "turborepo"
+  ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,json,css,md}\"",
+    "postinstall": "echo 'Hydro-Orbit dependencies installed. Run pnpm dev to start.'"
   },
   "devDependencies": {
-    "turbo": "latest"
+    "turbo": "latest",
+    "prettier": "^3.0.0"
   },
   "packageManager": "pnpm@8.6.0"
 }

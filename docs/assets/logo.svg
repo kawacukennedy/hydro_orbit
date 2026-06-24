@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+  <!-- Water drop -->
+  <path d="M60 10 C60 10 30 55 30 75 C30 91.6 43.4 105 60 105 C76.6 105 90 91.6 90 75 C90 55 60 10 60 10Z"
+        fill="url(#g)" opacity="0.9"/>
+  <!-- Orbit ring -->
+  <ellipse cx="60" cy="75" rx="38" ry="12" fill="none" stroke="#059669" stroke-width="2.5" opacity="0.5"/>
+  <ellipse cx="60" cy="75" rx="38" ry="12" fill="none" stroke="#0EA5E9" stroke-width="2.5" opacity="0.3"
+           transform="rotate(-30 60 75)"/>
+  <!-- Droplet highlight -->
+  <ellipse cx="50" cy="50" rx="6" ry="10" fill="white" opacity="0.3" transform="rotate(-20 50 50)"/>
+  <!-- Small dots on orbit -->
+  <circle cx="98" cy="75" r="3" fill="#059669" opacity="0.7"/>
+  <circle cx="22" cy="75" r="2" fill="#0EA5E9" opacity="0.5"/>
+</svg>

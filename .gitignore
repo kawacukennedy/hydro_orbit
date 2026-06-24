@@ -1,9 +1,49 @@
+# Dependencies
 node_modules
+.pnp
+.pnp.js
+
+# Build outputs
 dist
+.next
+build
+*.tsbuildinfo
+
+# Environment
 .env
+.env.local
+.env.production
+.env.*.local
+
+# IDE
 .DS_Store
+.vscode/settings.json
+.idea
+*.swp
+*.swo
+
+# Testing
 coverage
+.nyc_output
+
+# Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Firmware
 firmware/.pio
+firmware/.pioenvs
+firmware/.piolib
+
+# Python
 ai-engine/__pycache__
 ai-engine/venv
+ai-engine/.venv
+*.pyc
+
+# Turborepo
+.turbo
+
+# Docker
+.docker

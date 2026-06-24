@@ -2,15 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN npm install
+COPY pnpm-lock.yaml package.json ./
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
 COPY . .
 
-RUN npx prisma generate
+RUN pnpm db:generate
 
-RUN npm run build
+RUN pnpm build
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]

@@ -1,0 +1,6 @@
+node_modules
+dist
+.turbo
+.pio
+pnpm-lock.yaml
+*.svg

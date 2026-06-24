@@ -1,13 +1,15 @@
 {
   "name": "@hydro-orbit/shared-utils",
   "version": "1.0.0",
+  "description": "Shared utility functions for Hydro-Orbit",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "scripts": {
     "lint": "eslint src/",
-    "test": "echo \"No tests configured\""
+    "test": "vitest run"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }

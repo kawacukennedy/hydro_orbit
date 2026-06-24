@@ -50,7 +50,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     if (strcmp(command, "start") == 0) {
       int zone = doc["zone"];
       int duration = doc[".printduration"];
-      Serial("Starting irrigation - Zone: ");
+      Serial.println("Starting irrigation - Zone: ");
       Serial.print(zone);
       Serial.print(", Duration: ");
       Serial.println(duration);
