@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { Settings, User, Bell, Smartphone, CreditCard, Save } from 'lucide-react';
 import { Card, CardContent, Button, Input, Badge } from '@hydro-orbit/ui';
 import { useSettingsStore } from '../stores/settingsStore';
-import { useSensors } from '../hooks/useApi';
-import { SensorStatus } from '@hydro-orbit/shared-types';
+import { useSensorReadings, useSolarStatus } from '../hooks/useApi';
 
 const tabs = [
   { id: 'profile', label: 'Profile', icon: User },
@@ -16,15 +15,16 @@ const tabs = [
 export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
   const { notifications, setNotifications } = useSettingsStore();
-  const { data: sensors } = useSensors();
+  const { data: sensorData } = useSensorReadings();
+  const { data: solar } = useSolarStatus();
 
   const devices = [
-    { name: 'Main Controller', id: 'esp32-001', status: 'online', firmware: '1.2.0' },
-    ...(sensors || []).map(s => ({
-      name: `Sensor ${s.id}`,
-      id: s.id,
-      status: s.status === SensorStatus.ONLINE ? 'online' : 'offline',
-      battery: `${s.battery || 0}%`
+    { name: 'Main Controller', id: 'esp32-001', status: 'online', firmware: '1.2.0', battery: `${solar?.batteryLevel || 0}%` },
+    ...(sensorData?.readings || []).map((r: any) => ({
+      name: `${r.zoneName}`,
+      id: r.zoneId,
+      status: r.status === 'critical' ? 'offline' : 'online',
+      battery: `${solar?.batteryLevel || 0}%`
     }))
   ];
 
