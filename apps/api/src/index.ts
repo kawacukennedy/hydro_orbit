@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { createClient } from 'redis';
 import dotenv from 'dotenv';
 import { logger } from './utils/logger.js';
@@ -8,6 +10,8 @@ import { SimulationEngine } from './simulation.js';
 import { router as demoRouter } from './routes/demo.js';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config();
 
@@ -82,6 +86,10 @@ if (DEMO_MODE && simulationEngine) {
   }).catch(err => logger.error('Failed to load production routes:', err));
 }
 
+const WEB_DIST = path.resolve(__dirname, '../../web/dist');
+
+app.use(express.static(WEB_DIST));
+
 app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
@@ -90,6 +98,12 @@ app.get('/health', (req, res) => {
     uptime: process.uptime(),
     timezone: DEFAULT_TIMEZONE,
   });
+});
+
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  if (req.path.startsWith('/socket.io/')) return next();
+  res.sendFile(path.join(WEB_DIST, 'index.html'));
 });
 
 app.use(errorHandler);

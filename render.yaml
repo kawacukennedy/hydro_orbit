@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: hydro-orbit
+    env: node
+    repo: https://github.com/kawacukennedy/hydro_orbit
+    branch: main
+    buildCommand: pnpm install && pnpm build
+    startCommand: node apps/api/dist/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEMO_MODE
+        value: "true"
+      - key: PORT
+        value: "10000"
