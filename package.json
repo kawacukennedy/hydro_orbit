@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "pnpm --filter=@hydro-orbit/web build && pnpm --filter=@hydro-orbit/api build",
+    "build": "turbo run build",
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,js,json,css,md}\"",
