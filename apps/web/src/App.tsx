@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ToastProvider } from './components/Toast';
 import MainLayout from './layouts/MainLayout';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -21,27 +22,29 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <ErrorBoundary>
-      <Routes>
-      <Route path="/" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <PrivateRoute>
-            <MainLayout />
-          </PrivateRoute>
-        }
-      >
-        <Route index element={<DashboardPage />} />
-        <Route path="create-farm" element={<CreateFarmPage />} />
-        <Route path="farm/:farmId" element={<FarmDetailPage />} />
-        <Route path="sensors" element={<SensorsPage />} />
-        <Route path="irrigation" element={<IrrigationControlPage />} />
-        <Route path="history" element={<HistoryPage />} />
-        <Route path="alerts" element={<AlertsPage />} />
-        <Route path="settings" element={<SettingsPage />} />
-      </Route>
-    </Routes>
+      <ToastProvider>
+        <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <MainLayout />
+            </PrivateRoute>
+          }
+        >
+          <Route index element={<DashboardPage />} />
+          <Route path="create-farm" element={<CreateFarmPage />} />
+          <Route path="farm/:farmId" element={<FarmDetailPage />} />
+          <Route path="sensors" element={<SensorsPage />} />
+          <Route path="irrigation" element={<IrrigationControlPage />} />
+          <Route path="history" element={<HistoryPage />} />
+          <Route path="alerts" element={<AlertsPage />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
+      </Routes>
+      </ToastProvider>
     </ErrorBoundary>
   );
 }
