@@ -19,7 +19,7 @@ import { useAlertsStore } from '../stores/alertsStore';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { label: 'My Farm', icon: Map, path: '/dashboard/farm/current' },
+  { label: 'My Farm', icon: Map, path: '/dashboard/farm/farm-1' },
   { label: 'Create Farm', icon: Map, path: '/dashboard/create-farm' },
   { label: 'Sensors', icon: Cpu, path: '/dashboard/sensors' },
   { label: 'Irrigation', icon: Droplets, path: '/dashboard/irrigation' },
